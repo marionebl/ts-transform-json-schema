@@ -1,0 +1,13 @@
+{
+  "name": "ts-transform-json-schema-exampple",
+  "version": "1.0.0",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/marionebl/ts-transform-json-schema.git"
+  },
+  "devDependencies": {
+    "ttypescript": "^1.5.5",
+    "typescript": "^3.0.3"
+  }
+}

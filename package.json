@@ -1,0 +1,46 @@
+{
+  "name": "ts-transform-json-schema",
+  "version": "1.0.0",
+  "description": "Generate inline JSON schema from TypeScript types",
+  "files": [
+    "lib",
+    "index.d.ts",
+    "index.js"
+  ],
+  "scripts": {
+    "test": "jest",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/marionebl/ts-transform-json-schema.git"
+  },
+  "keywords": [
+    "ts-transform"
+  ],
+  "author": "Mario Nebl <hello@mario-nebl.de>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/marionebl/ts-transform-json-schema/issues"
+  },
+  "homepage": "https://github.com/marionebl/ts-transform-json-schema#readme",
+  "devDependencies": {
+    "@types/jest": "^23.3.1",
+    "@types/node": "^10.10.3",
+    "@types/require-from-string": "^1.2.0",
+    "babel-core": "^6.26.3",
+    "babel-jest": "^23.4.2",
+    "jest": "^23.5.0",
+    "memfs": "^2.10.0",
+    "require-from-string": "^2.0.2",
+    "ts-jest": "^23.1.4",
+    "ts-node": "^7.0.1",
+    "ttypescript": "^1.5.5",
+    "typescript": "^3.0.3"
+  },
+  "dependencies": {
+    "@types/resolve": "0.0.8",
+    "resolve": "^1.8.1",
+    "typescript-json-schema": "^0.32.0"
+  }
+}
