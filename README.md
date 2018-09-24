@@ -15,7 +15,7 @@ export interface SomeInterface {
   c?: boolean;
 }
 
-export const schema = JsonSchema.fromType(SomeInterface);
+export const schema = JsonSchema.fromType<SomeInterface>();
 ```
 
 ```js 
@@ -25,7 +25,7 @@ export const schema = JsonSchema.fromType(SomeInterface);
     "target": "es2015",
     "plugins": [
       {
-        "transform": "../lib",
+        "transform": "ts-transform-json-schema",
         "type": "program"
       }
     ]
@@ -36,7 +36,7 @@ export const schema = JsonSchema.fromType(SomeInterface);
 **Out**
 
 ```ts
-import * as JsonSchema from "../lib/from-type";
+import * as JsonSchema from "ts-transform-json-schema";
 export const schema = { 
   type: "object", 
   properties: { 
