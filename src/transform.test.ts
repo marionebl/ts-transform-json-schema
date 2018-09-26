@@ -64,3 +64,29 @@ test("creates union schemas", () => {
     ]
   }));
 });
+
+
+test("respects required option", () => {
+  MemFs.vol.fromJSON({
+    "/index.ts": `
+    import { fromType } from "ts-transform-json-schema";
+
+    export interface A {
+      ab: string;
+      cd?: string;
+    }
+
+    export const schema = fromType<A>();
+  `
+  });
+
+  Test.compile(MemFs.fs, { required: true });
+
+  const mod = requireFromString(String(MemFs.fs.readFileSync("/index.js")).split('\n')
+    .find(line => line.indexOf('exports.schema') === 0));
+
+    expect(mod.schema).toEqual(expect.objectContaining({
+      properties: { ab: { type: "string" }, cd: { type: "string" } },
+      required: ["ab"]
+    }));
+});

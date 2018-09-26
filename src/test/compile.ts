@@ -11,7 +11,7 @@ export interface Env {
   [key: string]: string;
 }
 
-export function compile(fs: MemFs.IFs): void {
+export function compile(fs: MemFs.IFs, opts?: unknown): void {
   const options = {
     strict: true,
     noEmitOnError: true,
@@ -19,7 +19,14 @@ export function compile(fs: MemFs.IFs): void {
     moduleResolution: ts.ModuleResolutionKind.NodeJs, 
     target: ts.ScriptTarget.ES2015,
     module: ts.ModuleKind.CommonJS,
-    outDir: '/'
+    outDir: '/',
+    plugins: [
+      ({
+        transform: "ts-transform-json-schema",
+        type: "program",
+        options: opts || {}
+      } as any)
+    ]
   };
 
   const host = ts.createCompilerHost(options);
