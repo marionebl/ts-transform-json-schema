@@ -89,3 +89,33 @@ test("respects required option", () => {
       required: ["ab"]
     }));
 });
+
+
+test("handles partials correctly", () => {
+  MemFs.vol.fromJSON({
+    "/index.ts": `
+    import { fromType } from "ts-transform-json-schema";
+
+    export interface A {
+      a: string;
+      b?: Partial<B>;
+    }
+
+    export interface B {
+      b: string;
+    }
+
+    export const schema = fromType<A>();
+  `
+  });
+
+  Test.compile(MemFs.fs, { required: true });
+
+  const getModule = () => requireFromString(String(
+      MemFs.fs.readFileSync("/index.js"))
+        .split('\n')
+        .find(line => line.indexOf('exports.schema') === 0)
+        );
+
+  expect(() => getModule()).not.toThrow();
+});

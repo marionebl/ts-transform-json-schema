@@ -4,7 +4,7 @@ import * as tjs from "typescript-json-schema";
 import * as readPkgUp from "read-pkg-up";
 
 export interface TransformerOptions {
-  env: { [key: string]: string; }
+  env: { [key: string]: string };
 }
 
 const SOURCES = new Set(["from-type.ts", "from-type.d.ts"]);
@@ -26,10 +26,10 @@ export const getTransformer = (program: ts.Program) => {
         const signature = typeChecker.getResolvedSignature(node);
 
         if (
-          signature !== undefined
-          && signature.declaration !== undefined
-          && node.typeArguments !== undefined
-          && node.typeArguments.length === 1
+          signature !== undefined &&
+          signature.declaration !== undefined &&
+          node.typeArguments !== undefined &&
+          node.typeArguments.length === 1
         ) {
           const sourceName = signature.declaration.getSourceFile().fileName;
 
@@ -37,7 +37,9 @@ export const getTransformer = (program: ts.Program) => {
             return ts.visitEachChild(node, visitor, ctx);
           }
 
-          const pkg = readPkgUp.sync({ cwd: Path.dirname(sourceName) }).pkg || { name: "" };
+          const pkg = readPkgUp.sync({ cwd: Path.dirname(sourceName) }).pkg || {
+            name: ""
+          };
 
           if (pkg.name !== "ts-transform-json-schema") {
             return ts.visitEachChild(node, visitor, ctx);
@@ -45,13 +47,24 @@ export const getTransformer = (program: ts.Program) => {
 
           const typeArgument = node.typeArguments[0];
           const type = typeChecker.getTypeFromTypeNode(typeArgument);
-          const schema = tjs.generateSchema(program, (type.symbol || type.aliasSymbol).name, options);
+          const schema = tjs.generateSchema(
+            program,
+            (type.symbol || type.aliasSymbol).name,
+            options
+          );
           return toLiteral(schema);
         }
       }
 
-      if (ts.isImportDeclaration(node) && node.moduleSpecifier.getText() === "ts-transform-json-schema") {
-        return ts.addSyntheticLeadingComment(node, ts.SyntaxKind.SingleLineCommentTrivia, '');
+      if (
+        ts.isImportDeclaration(node) &&
+        node.moduleSpecifier.getText() === "ts-transform-json-schema"
+      ) {
+        return ts.addSyntheticLeadingComment(
+          node,
+          ts.SyntaxKind.SingleLineCommentTrivia,
+          ""
+        );
       }
 
       return ts.visitEachChild(node, visitor, ctx);
@@ -67,17 +80,28 @@ export const getTransformer = (program: ts.Program) => {
 
 // TODO: Factor out, test
 function toLiteral(input: unknown): ts.PrimaryExpression {
-  if (typeof input === "string" || typeof input === "boolean" || typeof input === "number") {
+  if (
+    typeof input === "string" ||
+    typeof input === "boolean" ||
+    typeof input === "number"
+  ) {
     return ts.createLiteral(input);
   }
 
   if (typeof input === "object" && Array.isArray(input)) {
-    return ts.createArrayLiteral(input.map(toLiteral))
+    return ts.createArrayLiteral(input.map(toLiteral));
   }
 
   if (typeof input === "object" && !Array.isArray(input)) {
     const ob = input as object;
-    return ts.createObjectLiteral(Object.keys(ob).map(key => ts.createPropertyAssignment(key, toLiteral(ob[key]))));
+    return ts.createObjectLiteral(
+      Object.keys(ob).map(key =>
+        ts.createPropertyAssignment(
+          ts.createLiteral(key),
+          toLiteral(ob[key])
+        )
+      )
+    );
   }
 
   return ts.createNull();
