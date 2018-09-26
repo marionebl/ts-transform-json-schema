@@ -64,8 +64,31 @@ npm install ts-transform-json-schema ttypescript --save-dev
     "target": "es2015",
     "plugins": [
       {
-        "transform": "../lib",
+        "transform": "ts-transform-json-schema",
         "type": "program"
+      }
+    ]
+  }
+}
+```
+
+## Options
+
+`typescript-json-schema` can be configured by passing an `options` object.
+See the [typescript-json-schema](https://github.com/YousefED/typescript-json-schema#usage) docs for reference.
+
+```js
+// tsconfig.json
+{
+  "compilerOptions": {
+    "target": "es2015",
+    "plugins": [
+      {
+        "transform": "ts-transform-json-schema",
+        "type": "program",
+        "options": {
+          "required": true
+        }
       }
     ]
   }

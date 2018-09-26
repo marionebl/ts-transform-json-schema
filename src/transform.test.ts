@@ -65,7 +65,6 @@ test("creates union schemas", () => {
   }));
 });
 
-
 test("respects required option", () => {
   MemFs.vol.fromJSON({
     "/index.ts": `
