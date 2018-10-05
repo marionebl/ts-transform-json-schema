@@ -92,7 +92,7 @@ function toLiteral(input: unknown): ts.PrimaryExpression {
     return ts.createArrayLiteral(input.map(toLiteral));
   }
 
-  if (typeof input === "object" && !Array.isArray(input)) {
+  if (input !== null && typeof input === "object" && !Array.isArray(input)) {
     const ob = input as object;
     return ts.createObjectLiteral(
       Object.keys(ob).map(key =>

@@ -119,3 +119,28 @@ test("handles partials correctly", () => {
 
   expect(() => getModule()).not.toThrow();
 });
+
+
+test("handles null correctly", () => {
+  MemFs.vol.fromJSON({
+    "/index.ts": `
+    import { fromType } from "ts-transform-json-schema";
+
+    export interface A {
+      a: null;
+    }
+
+    export const schema = fromType<A>();
+  `
+  });
+
+  Test.compile(MemFs.fs, { required: true });
+
+  const getModule = () => requireFromString(String(
+      MemFs.fs.readFileSync("/index.js"))
+        .split('\n')
+        .find(line => line.indexOf('exports.schema') === 0)
+        );
+
+  expect(() => getModule()).not.toThrow();
+});
