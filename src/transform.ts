@@ -2,6 +2,7 @@ import * as Path from "path";
 import * as ts from "typescript";
 import * as tjs from "@marionebl/typescript-json-schema";
 import * as readPkgUp from "read-pkg-up";
+import * as JSON5 from "json5";
 
 export interface TransformerOptions {
   env: { [key: string]: string };
@@ -10,31 +11,20 @@ export interface TransformerOptions {
 const SOURCES = new Set(["from-type.ts", "from-type.d.ts"]);
 
 export const getTransformer = (program: ts.Program) => {
+  const typeChecker = program.getTypeChecker();
+
   function getVisitor(ctx: ts.TransformationContext, sf: ts.SourceFile) {
-    const typeChecker = program.getTypeChecker();
-    const compilerOptions = ctx.getCompilerOptions();
-    const plugins = (compilerOptions.plugins || []) as any[];
-
-    const plugin = plugins
-      .filter(p => typeof p === "object" && p.hasOwnProperty("transform"))
-      .find(p => p.transform === "ts-transform-json-schema");
-
-    const options = plugin ? plugin.options || {} : {};
-    const generator = tjs.buildGenerator(program, options);
-
-    if (generator === null) {
-      throw new Error(`Could not create JSONSchema generator`);
-    }
-
     const visitor: ts.Visitor = (node: ts.Node): ts.VisitResult<ts.Node> => {
       if (ts.isCallExpression(node)) {
+        if (typeof node.typeArguments === 'undefined' || node.typeArguments.length === 0) {
+          return;
+        }
+
         const signature = typeChecker.getResolvedSignature(node);
 
         if (
           signature !== undefined &&
-          signature.declaration !== undefined &&
-          node.typeArguments !== undefined &&
-          node.typeArguments.length === 1
+          signature.declaration !== undefined
         ) {
           const sourceName = signature.declaration.getSourceFile().fileName;
 
@@ -55,8 +45,21 @@ export const getTransformer = (program: ts.Program) => {
           const type = typeChecker.getTypeFromTypeNode(typeArgument);
           const symbol = (type.symbol || type.aliasSymbol);
 
+          const argNode = node.arguments[0];
+          const options = argNode ? getOptions(argNode) : {};
+
           if (typeof symbol === 'undefined' || symbol === null) {
             throw new Error(`Could not find symbol for passed type`);
+          }
+
+          const generator = tjs.buildGenerator(program, options as any);
+
+          if (generator === null) {
+            throw new Error(`Could not create JSONSchema generator`);
+          }
+
+          if (typeof options !== 'undefined') {
+            (generator as any).args = options;
           }
 
           return toLiteral(generator.getSchemaForSymbol(symbol.name, true));
@@ -112,4 +115,12 @@ function toLiteral(input: unknown): ts.PrimaryExpression {
   }
 
   return ts.createNull();
+}
+
+function getOptions(node: ts.Node): unknown {
+  try {
+    return JSON5.parse(node.getText())
+  } catch (err) {
+    return;
+  }
 }

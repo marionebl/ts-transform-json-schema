@@ -4,7 +4,7 @@
 
 ## Example
 
-**In**
+### In
 
 ```ts
 import * as JsonSchema from "ts-transform-json-schema";
@@ -15,10 +15,12 @@ export interface SomeInterface {
   c?: boolean;
 }
 
-export const schema = JsonSchema.fromType<SomeInterface>();
+export const schema = JsonSchema.fromType<SomeInterface>({
+  additionalProperties: false
+});
 ```
 
-```js 
+```js
 // tsconfig.json
 {
   "compilerOptions": {
@@ -33,11 +35,12 @@ export const schema = JsonSchema.fromType<SomeInterface>();
 }
 ```
 
-**Out**
+### Out
 
 ```ts
 import * as JsonSchema from "ts-transform-json-schema";
-export const schema = { 
+export const schema = {
+  additionalProperties: false,
   type: "object", 
   properties: { 
     a: { type: "string" }, 
@@ -66,29 +69,6 @@ npm install ts-transform-json-schema ttypescript --save-dev
       {
         "transform": "ts-transform-json-schema",
         "type": "program"
-      }
-    ]
-  }
-}
-```
-
-## Options
-
-`typescript-json-schema` can be configured by passing an `options` object.
-See the [typescript-json-schema](https://github.com/YousefED/typescript-json-schema#usage) docs for reference.
-
-```js
-// tsconfig.json
-{
-  "compilerOptions": {
-    "target": "es2015",
-    "plugins": [
-      {
-        "transform": "ts-transform-json-schema",
-        "type": "program",
-        "options": {
-          "required": true
-        }
       }
     ]
   }
