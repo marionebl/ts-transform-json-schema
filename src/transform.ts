@@ -3,6 +3,7 @@ import * as ts from "typescript";
 import * as tjs from "@marionebl/typescript-json-schema";
 import * as readPkgUp from "read-pkg-up";
 import * as JSON5 from "json5";
+import * as resolveFrom from "resolve-from";
 
 export interface TransformerOptions {
   env: { [key: string]: string };
@@ -17,7 +18,7 @@ export const getTransformer = (program: ts.Program) => {
     const visitor: ts.Visitor = (node: ts.Node): ts.VisitResult<ts.Node> => {
       if (ts.isCallExpression(node)) {
         if (typeof node.typeArguments === 'undefined' || node.typeArguments.length === 0) {
-          return;
+          return node;
         }
 
         const signature = typeChecker.getResolvedSignature(node);
@@ -65,16 +66,19 @@ export const getTransformer = (program: ts.Program) => {
           return toLiteral(generator.getSchemaForSymbol(symbol.name, true));
         }
       }
+      
+      const dirName = Path.dirname(node.getSourceFile().fileName);
 
       if (
-        ts.isImportDeclaration(node) &&
-        node.moduleSpecifier.getText() === "ts-transform-json-schema"
+        ts.isImportDeclaration(node)
       ) {
-        return ts.addSyntheticLeadingComment(
-          node,
-          ts.SyntaxKind.SingleLineCommentTrivia,
-          ""
-        );
+        const target = require.resolve('./from-type');
+        const rawSpec = node.moduleSpecifier.getText();
+        const spec = rawSpec.substring(1, rawSpec.length - 1);
+
+        if (resolveFrom.silent(dirName, spec) === target) {
+          return;
+        }
       }
 
       return ts.visitEachChild(node, visitor, ctx);

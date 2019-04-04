@@ -7,3 +7,9 @@ export interface SomeInterface {
 }
 
 export const schema = JsonSchema.fromType<SomeInterface>();
+
+otherThing();
+
+function otherThing() {
+
+}
