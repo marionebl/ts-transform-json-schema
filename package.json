@@ -36,9 +36,10 @@
     "ts-jest": "^23.10.1",
     "ts-node": "^7.0.1",
     "ttypescript": "^1.5.5",
-    "typescript": "^3.0.3"
+    "typescript": "^3.4.1"
   },
   "dependencies": {
+    "@marionebl/typescript-json-schema": "^0.36.0",
     "@types/read-pkg-up": "^3.0.1",
     "@types/resolve": "0.0.8",
     "read-pkg-up": "^4.0.0",

@@ -1,6 +1,6 @@
 import * as Path from "path";
 import * as ts from "typescript";
-import * as tjs from "typescript-json-schema";
+import * as tjs from "@marionebl/typescript-json-schema";
 import * as readPkgUp from "read-pkg-up";
 
 export interface TransformerOptions {
@@ -20,6 +20,11 @@ export const getTransformer = (program: ts.Program) => {
       .find(p => p.transform === "ts-transform-json-schema");
 
     const options = plugin ? plugin.options || {} : {};
+    const generator = tjs.buildGenerator(program, options);
+
+    if (generator === null) {
+      throw new Error(`Could not create JSONSchema generator`);
+    }
 
     const visitor: ts.Visitor = (node: ts.Node): ts.VisitResult<ts.Node> => {
       if (ts.isCallExpression(node)) {
@@ -46,13 +51,15 @@ export const getTransformer = (program: ts.Program) => {
           }
 
           const typeArgument = node.typeArguments[0];
+
           const type = typeChecker.getTypeFromTypeNode(typeArgument);
-          const schema = tjs.generateSchema(
-            program,
-            (type.symbol || type.aliasSymbol).name,
-            options
-          );
-          return toLiteral(schema);
+          const symbol = (type.symbol || type.aliasSymbol);
+
+          if (typeof symbol === 'undefined' || symbol === null) {
+            throw new Error(`Could not find symbol for passed type`);
+          }
+
+          return toLiteral(generator.getSchemaForSymbol(symbol.name, true));
         }
       }
 
