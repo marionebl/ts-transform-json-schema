@@ -53,17 +53,7 @@ export const getTransformer = (program: ts.Program) => {
             throw new Error(`Could not find symbol for passed type`);
           }
 
-          const generator = tjs.buildGenerator(program, options as any);
-
-          if (generator === null) {
-            throw new Error(`Could not create JSONSchema generator`);
-          }
-
-          if (typeof options !== 'undefined') {
-            (generator as any).args = options;
-          }
-
-          return toLiteral(generator.getSchemaForSymbol(symbol.name, true));
+          return toLiteral(tjs.generateSchema(program as unknown as tjs.Program, symbol.name, options as tjs.PartialArgs));
         }
       }
       
