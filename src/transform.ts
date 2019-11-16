@@ -1,8 +1,6 @@
-import * as Path from "path";
 import * as ts from "typescript";
-import * as tjs from "@marionebl/typescript-json-schema";
+import * as tjs from "typescript-json-schema";
 import * as JSON5 from "json5";
-import * as resolveFrom from "resolve-from";
 
 export interface TransformerOptions {
   env: { [key: string]: string };

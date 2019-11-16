@@ -4,8 +4,7 @@ import * as MemFs from "memfs";
 import * as ts from "typescript";
 import * as resolve from "resolve";
 import { getTransformer } from "../transform";
-
-const pkg = require("../../package");
+import Dirent from "memfs/lib/Dirent";
 
 export interface Env {
   [key: string]: string;
@@ -120,7 +119,7 @@ interface FsOrigin<T> {
 interface ReadableFs {
   existsSync(path: string): boolean;
   readFileSync(path: string): string | Buffer;
-  readdirSync(path: string): (string | Buffer)[];
+  readdirSync(path: string): (string | Buffer | Dirent)[];
   statSync(path: string): Fs.Stats;
 }
 interface WriteableFs {

@@ -1,7 +1,7 @@
 import * as Test from "./test";
 import * as MemFs from "memfs";
 
-jest.mock("@marionebl/typescript-json-schema", () => ({
+jest.mock("typescript-json-schema", () => ({
   generateSchema: jest.fn()
 }));
 
@@ -29,7 +29,7 @@ test("creates basic schema", () => {
 
 test("calls typescript-json-schema with options", async () => {
   const options = { required: true };
-  const tjs = await import("@marionebl/typescript-json-schema");
+  const tjs = await import("typescript-json-schema");
 
   Test.fromString(`
     import { fromType } from "ts-transform-json-schema";
