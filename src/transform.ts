@@ -1,15 +1,12 @@
 import * as Path from "path";
 import * as ts from "typescript";
 import * as tjs from "@marionebl/typescript-json-schema";
-import * as readPkgUp from "read-pkg-up";
 import * as JSON5 from "json5";
 import * as resolveFrom from "resolve-from";
 
 export interface TransformerOptions {
   env: { [key: string]: string };
 }
-
-const SOURCES = new Set(["from-type.ts", "from-type.d.ts"]);
 
 export const getTransformer = (program: ts.Program) => {
   const typeChecker = program.getTypeChecker();
@@ -29,16 +26,9 @@ export const getTransformer = (program: ts.Program) => {
         ) {
           const sourceName = signature.declaration.getSourceFile().fileName;
 
-          if (!SOURCES.has(Path.basename(sourceName))) {
-            return ts.visitEachChild(node, visitor, ctx);
-          }
-
-          const pkg = readPkgUp.sync({ cwd: Path.dirname(sourceName) }).pkg || {
-            name: ""
-          };
-
-          if (pkg.name !== "ts-transform-json-schema") {
-            return ts.visitEachChild(node, visitor, ctx);
+          if (!sourceName.includes("ts-transform-json-schema")) {
+            return ts.visitEachChild(node, visitor
+              , ctx);
           }
 
           const typeArgument = node.typeArguments[0];
@@ -57,16 +47,13 @@ export const getTransformer = (program: ts.Program) => {
         }
       }
       
-      const dirName = Path.dirname(node.getSourceFile().fileName);
-
       if (
         ts.isImportDeclaration(node)
       ) {
-        const target = require.resolve('./from-type');
         const rawSpec = node.moduleSpecifier.getText();
         const spec = rawSpec.substring(1, rawSpec.length - 1);
 
-        if (resolveFrom.silent(dirName, spec) === target) {
+        if (spec === "ts-transform-json-schema") {
           return;
         }
       }

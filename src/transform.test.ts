@@ -1,15 +1,20 @@
 import * as Test from "./test";
 import * as MemFs from "memfs";
-import * as requireFromString from "require-from-string";
-import { fromType } from "./from-type";
+
+jest.mock("@marionebl/typescript-json-schema", () => ({
+  generateSchema: jest.fn()
+}));
 
 beforeEach(() => {
   MemFs.vol.reset();
 });
 
+afterEach(() => {
+  jest.resetAllMocks();
+});
+
 test("creates basic schema", () => {
-  MemFs.vol.fromJSON({
-    "/index.ts": `
+  const result = Test.fromString(`
     import { fromType } from "ts-transform-json-schema";
 
     export interface A {
@@ -17,68 +22,16 @@ test("creates basic schema", () => {
     }
 
     export const schema = fromType<A>();
-  `
-  });
+  `);
 
-  Test.compile(MemFs.fs);
-
-  const mod = requireFromString(
-    String(MemFs.fs.readFileSync("/index.js"))
-      .split("\n")
-      .find(line => line.indexOf("exports.schema") === 0)
-  );
-
-  expect(mod.schema).toEqual(
-    expect.objectContaining({
-      properties: { a: { type: "string" } }
-    })
-  );
+  expect(result).not.toContain("fromType");
 });
 
-test.skip("creates union schemas", () => {
-  MemFs.vol.fromJSON({
-    "/index.ts": `
-    import { fromType } from "ts-transform-json-schema";
+test("calls typescript-json-schema with options", async () => {
+  const options = { required: true };
+  const tjs = await import("@marionebl/typescript-json-schema");
 
-    export interface A {
-      a: string;
-    }
-
-    export interface B {
-      b: number;
-    }
-
-    export type C = A | B;
-
-    export const schema = fromType<C>();
-  `
-  });
-
-  Test.compile(MemFs.fs);
-
-  const mod = requireFromString(
-    String(MemFs.fs.readFileSync("/index.js"))
-      .split("\n")
-      .find(line => line.indexOf("exports.schema") === 0)
-  );
-
-  expect(mod.schema).toEqual(
-    expect.objectContaining({
-      anyOf: [
-        {
-          $ref: "#/definitions/A"
-        },
-        {
-          $ref: "#/definitions/B"
-        }
-      ]
-    })
-  );
-});
-
-test("respects required option", () => {
-  MemFs.vol.fromJSON({
-    "/index.ts": `
+  Test.fromString(`
     import { fromType } from "ts-transform-json-schema";
 
     export interface A {
@@ -86,98 +39,30 @@ test("respects required option", () => {
       cd?: string;
     }
 
-    export const schema = fromType<A>({
-      required: true
-    });
-  `
+    export const schema = fromType<A>(${JSON.stringify(options)});
+  `);
+
+  expect(tjs.generateSchema).toHaveBeenCalledWith(expect.any(Object), "A", {
+    required: true
   });
-
-  Test.compile(MemFs.fs);
-
-  const mod = requireFromString(
-    String(MemFs.fs.readFileSync("/index.js"))
-      .split("\n")
-      .find(line => line.indexOf("exports.schema") === 0)
-  );
-
-  expect(mod.schema).toEqual(
-    expect.objectContaining({
-      $schema: "http://json-schema.org/draft-07/schema#",
-      properties: { ab: { type: "string" }, cd: { type: "string" } },
-      required: ["ab"]
-    })
-  );
 });
 
-test("handles partials correctly", () => {
-  MemFs.vol.fromJSON({
-    "/index.ts": `
+test("removes ts-transform-json-schema import", async () => {
+  const result = Test.fromString(`
     import { fromType } from "ts-transform-json-schema";
+    console.log(fromType);
+  `);
 
-    export interface A {
-      a: string;
-      b?: Partial<B>;
-    }
-
-    export interface B {
-      b: string;
-    }
-
-    export const schema = fromType<A>();
-  `
-  });
-
-  Test.compile(MemFs.fs, { required: true });
-
-  const getModule = () =>
-    requireFromString(
-      String(MemFs.fs.readFileSync("/index.js"))
-        .split("\n")
-        .find(line => line.indexOf("exports.schema") === 0)
-    );
-
-  expect(() => getModule()).not.toThrow();
+  expect(result).not.toContain("ts-transform-json-schema");
 });
 
-test("handles null correctly", () => {
-  MemFs.vol.fromJSON({
-    "/index.ts": `
+test("keeps other imports intact", async () => {
+  const result = Test.fromString(`
     import { fromType } from "ts-transform-json-schema";
+    import * as B from "b";
+    console.log(fromType, B);
+  `);
 
-    export interface A {
-      a: null;
-    }
-
-    export const schema = fromType<A>();
-  `
-  });
-
-  Test.compile(MemFs.fs, { required: true });
-
-  const getModule = () =>
-    requireFromString(
-      String(MemFs.fs.readFileSync("/index.js"))
-        .split("\n")
-        .find(line => line.indexOf("exports.schema") === 0)
-    );
-
-  expect(() => getModule()).not.toThrow();
-});
-
-test("picks up passed options", () => {
-  MemFs.vol.fromJSON({
-    "/index.ts": `
-    import { fromType } from "ts-transform-json-schema";
-
-    export interface A {
-      a: null;
-    }
-
-    export const schema = fromType<A>({
-      required: true,
-      noExtraProps: true,
-      strictNullChecks: true
-    });
-  `
-  });
+  expect(result).not.toContain("ts-transform-json-schema");
+  expect(result).toContain('require("b")');
 });
