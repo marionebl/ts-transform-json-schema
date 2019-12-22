@@ -12,42 +12,45 @@ export const getTransformer = (program: ts.Program) => {
   function getVisitor(ctx: ts.TransformationContext, sf: ts.SourceFile) {
     const visitor: ts.Visitor = (node: ts.Node): ts.VisitResult<ts.Node> => {
       if (ts.isCallExpression(node)) {
-        if (typeof node.typeArguments === 'undefined' || node.typeArguments.length === 0) {
+        if (
+          typeof node.typeArguments === "undefined" ||
+          node.typeArguments.length === 0
+        ) {
           return node;
         }
 
         const signature = typeChecker.getResolvedSignature(node);
 
-        if (
-          signature !== undefined &&
-          signature.declaration !== undefined
-        ) {
+        if (signature !== undefined && signature.declaration !== undefined) {
           const sourceName = signature.declaration.getSourceFile().fileName;
 
           if (!sourceName.includes("ts-transform-json-schema")) {
-            return ts.visitEachChild(node, visitor
-              , ctx);
+            return ts.visitEachChild(node, visitor, ctx);
           }
 
           const typeArgument = node.typeArguments[0];
 
           const type = typeChecker.getTypeFromTypeNode(typeArgument);
-          const symbol = (type.symbol || type.aliasSymbol);
+          const symbol = type.symbol || type.aliasSymbol;
 
           const argNode = node.arguments[0];
           const options = argNode ? getOptions(argNode) : {};
 
-          if (typeof symbol === 'undefined' || symbol === null) {
+          if (typeof symbol === "undefined" || symbol === null) {
             throw new Error(`Could not find symbol for passed type`);
           }
 
-          return toLiteral(tjs.generateSchema(program as unknown as tjs.Program, symbol.name, options as tjs.PartialArgs));
+          return toLiteral(
+            tjs.generateSchema(
+              (program as unknown) as tjs.Program,
+              symbol.name,
+              options as tjs.PartialArgs
+            )
+          );
         }
       }
-      
-      if (
-        ts.isImportDeclaration(node)
-      ) {
+
+      if (ts.isImportDeclaration(node)) {
         const rawSpec = node.moduleSpecifier.getText();
         const spec = rawSpec.substring(1, rawSpec.length - 1);
 
@@ -85,10 +88,7 @@ function toLiteral(input: unknown): ts.PrimaryExpression {
     const ob = input as object;
     return ts.createObjectLiteral(
       Object.keys(ob).map(key =>
-        ts.createPropertyAssignment(
-          ts.createLiteral(key),
-          toLiteral(ob[key])
-        )
+        ts.createPropertyAssignment(ts.createLiteral(key), toLiteral(ob[key]))
       )
     );
   }
@@ -97,8 +97,8 @@ function toLiteral(input: unknown): ts.PrimaryExpression {
 }
 
 function getOptions(node: ts.Node): unknown {
-  try {
-    return JSON5.parse(node.getText())
+  try {
+    return JSON5.parse(node.getText());
   } catch (err) {
     return;
   }

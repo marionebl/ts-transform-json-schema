@@ -1,20 +1,37 @@
-import * as Test from "./test";
-import * as MemFs from "memfs";
+import { transformString, transformFile } from "ts-transformer-testing-library";
+import { getTransformer } from "./transform";
+
+const transform = (contents: string) =>
+  transformFile(
+    {
+      path: "/index.ts",
+      contents
+    },
+    {
+      transform: getTransformer,
+      mocks: [
+        {
+          name: "ts-transform-json-schema",
+          content: `export function fromType<T>(opts?: any) { throw new Error('should be transpiled') }`
+        },
+        {
+          name: "b",
+          content: `export {}`
+        }
+      ]
+    }
+  );
 
 jest.mock("typescript-json-schema", () => ({
   generateSchema: jest.fn()
 }));
-
-beforeEach(() => {
-  MemFs.vol.reset();
-});
 
 afterEach(() => {
   jest.resetAllMocks();
 });
 
 test("creates basic schema", () => {
-  const result = Test.fromString(`
+  const result = transform(`
     import { fromType } from "ts-transform-json-schema";
 
     export interface A {
@@ -31,7 +48,7 @@ test("calls typescript-json-schema with options", async () => {
   const options = { required: true };
   const tjs = await import("typescript-json-schema");
 
-  Test.fromString(`
+  transform(`
     import { fromType } from "ts-transform-json-schema";
 
     export interface A {
@@ -48,7 +65,7 @@ test("calls typescript-json-schema with options", async () => {
 });
 
 test("removes ts-transform-json-schema import", async () => {
-  const result = Test.fromString(`
+  const result = transform(`
     import { fromType } from "ts-transform-json-schema";
     console.log(fromType);
   `);
@@ -57,12 +74,12 @@ test("removes ts-transform-json-schema import", async () => {
 });
 
 test("keeps other imports intact", async () => {
-  const result = Test.fromString(`
+  const result = transform(`
     import { fromType } from "ts-transform-json-schema";
     import * as B from "b";
     console.log(fromType, B);
   `);
 
   expect(result).not.toContain("ts-transform-json-schema");
-  expect(result).toContain('require("b")');
+  expect(result).toContain('import * as B from "b"');
 });
