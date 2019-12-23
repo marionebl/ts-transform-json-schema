@@ -1,35 +1,20 @@
-import * as Ts from "typescript";
-import { transformFile } from "ts-transformer-testing-library";
+import Ts from "typescript";
+import { Transformer } from "ts-transformer-testing-library";
 import * as Test from "./test";
 import { getTransformer } from "./transform";
 
-const transform = (contents: string) =>
-  transformFile(
-    {
-      path: "/index.ts",
-      contents
-    },
-    {
-      transform: getTransformer,
-      compilerOptions: {
-        module: Ts.ModuleKind.CommonJS
-      },
-      mocks: [
-        {
-          name: "ts-transform-json-schema",
-          content: `export function fromType<T>(opts?: any) { throw new Error('should be transpiled') }`
-        },
-        {
-          name: "b",
-          content: `export {}`
-        }
-      ]
-    }
-  );
+const transformer = new Transformer().addTransformer(getTransformer).addMock({
+  name: "ts-transform-json-schema",
+  content: `export function fromType<T>(opts?: any) { throw new Error('should be transpiled') }`
+});
 
 test("handles partials correctly", () => {
-  const result = transform(
-    `
+  const result = transformer
+    .setCompilerOptions({
+      module: Ts.ModuleKind.CommonJS
+    })
+    .transform(
+      `
       import { fromType } from "ts-transform-json-schema";
   
       export interface A {
@@ -43,7 +28,7 @@ test("handles partials correctly", () => {
   
       export const schema = fromType<A>({ required: true });
     `
-  );
+    );
 
   const schema = Test.getSchema(result);
 
@@ -60,7 +45,9 @@ test("handles partials correctly", () => {
 });
 
 test("handles null correctly", () => {
-  const result = transform(`
+  const result = transformer.setCompilerOptions({
+    module: Ts.ModuleKind.CommonJS
+  }).transform(`
       import { fromType } from "ts-transform-json-schema";
   
       export interface A {

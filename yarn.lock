@@ -1105,10 +1105,6 @@ fast-deep-equal@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/fast-deep-equal/-/fast-deep-equal-1.1.0.tgz#c053477817c86b51daa853c81e059b733d023614"
 
-fast-extend@0.0.2:
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/fast-extend/-/fast-extend-0.0.2.tgz#f5ec42cf40b9460f521a6387dfb52deeed671dbd"
-
 fast-extend@1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/fast-extend/-/fast-extend-1.0.2.tgz#3b8a5b09cbc8ff3d6d47eaf397398c0a643e441b"
@@ -1171,7 +1167,7 @@ fs-minipass@^1.2.5:
   dependencies:
     minipass "^2.2.1"
 
-fs-monkey@0.3.3, fs-monkey@^0.3.3:
+fs-monkey@0.3.3:
   version "0.3.3"
   resolved "https://registry.yarnpkg.com/fs-monkey/-/fs-monkey-0.3.3.tgz#7960bb2b1fa2653731b9d0e2e84812a7e8b3664a"
 
@@ -2193,14 +2189,6 @@ mem@^4.0.0:
     map-age-cleaner "^0.1.1"
     mimic-fn "^1.0.0"
     p-is-promise "^1.1.0"
-
-memfs@^2.10.0:
-  version "2.16.1"
-  resolved "https://registry.yarnpkg.com/memfs/-/memfs-2.16.1.tgz#ef6ed9b24c7df07704758fce42431c3838291ffa"
-  integrity sha512-hOUIxeXPuDeryPx1h+WxkBWJwWmd8f1lYXBdUMFMLEhxGGlaP6ri30eW9K4cMpbuizNsAwQe2SK3KyRa9qodXw==
-  dependencies:
-    fast-extend "0.0.2"
-    fs-monkey "^0.3.3"
 
 memfs@^3.0.1:
   version "3.0.1"
@@ -3249,10 +3237,10 @@ ts-node@^8.5.2:
     source-map-support "^0.5.6"
     yn "^3.0.0"
 
-ts-transformer-testing-library@^1.0.0-alpha.2:
-  version "1.0.0-alpha.2"
-  resolved "https://registry.yarnpkg.com/ts-transformer-testing-library/-/ts-transformer-testing-library-1.0.0-alpha.2.tgz#16333694ac105461037acfbd813e795a0fd9c2e1"
-  integrity sha512-EBZNBTmSscTBQPzJWhZ9Cwjg7CLxjyt+1KQFACVRWpmDhBxara2A7yN2PWqUF15yZOwJzQGGj2/u8WuxidnYOQ==
+ts-transformer-testing-library@^1.0.0-alpha.3:
+  version "1.0.0-alpha.3"
+  resolved "https://registry.yarnpkg.com/ts-transformer-testing-library/-/ts-transformer-testing-library-1.0.0-alpha.3.tgz#e126ae77d330c03d314df90d67113ae269775f44"
+  integrity sha512-NpKDoGfVaZFXPY9BoquRp/zTTeWUaipkWjoNWm7wsxRP7Ge9JircEqBokp+7F5lOuEexEqESwHtdqI2BWCjjqg==
   dependencies:
     memfs "^3.0.1"
     resolve "^1.14.1"
