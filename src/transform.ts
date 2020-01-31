@@ -31,7 +31,7 @@ export const getTransformer = (program: ts.Program) => {
           const typeArgument = node.typeArguments[0];
 
           const type = typeChecker.getTypeFromTypeNode(typeArgument);
-          const symbol = type.symbol || type.aliasSymbol;
+          const symbol = type.aliasSymbol || type.symbol;
 
           const argNode = node.arguments[0];
           const options = argNode ? getOptions(argNode) : {};
