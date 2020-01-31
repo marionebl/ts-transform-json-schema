@@ -43,6 +43,6 @@
     "@marionebl/typescript-json-schema": "^0.36.0",
     "json5": "^2.1.1",
     "typescript": "^3.5.3",
-    "typescript-json-schema": "^0.40.0"
+    "typescript-json-schema": "^0.42.0"
   }
 }
