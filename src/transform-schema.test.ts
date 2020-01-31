@@ -26,7 +26,7 @@ test("handles partials correctly", () => {
         b: string;
       }
   
-      export const schema = fromType<A>({ required: true });
+      export const schema = fromType<A>({ required: true, ignoreErrors: true });
     `
     );
 
@@ -54,7 +54,7 @@ test("handles null correctly", () => {
         a: null;
       }
   
-      export const schema = fromType<A>();
+      export const schema = fromType<A>({ ignoreErrors: true });
     `);
 
   const schema = Test.getSchema(result);
