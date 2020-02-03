@@ -26,7 +26,7 @@ test("handles partials correctly", () => {
         b: string;
       }
   
-      export const schema = fromType<A>({ required: true });
+      export const schema = fromType<A>({ required: true, ignoreErrors: true });
     `
     );
 
@@ -54,7 +54,7 @@ test("handles null correctly", () => {
         a: null;
       }
   
-      export const schema = fromType<A>();
+      export const schema = fromType<A>({ ignoreErrors: true });
     `);
 
   const schema = Test.getSchema(result);
@@ -68,3 +68,28 @@ test("handles null correctly", () => {
     })
   );
 });
+
+test("hadles types correctly", () => {
+  const result = transformer.setCompilerOptions({
+    module: Ts.ModuleKind.CommonJS
+  }).transform(`
+    import { fromType } from "ts-transform-json-schema";
+
+    export type A = {
+      a: string
+    }
+
+    export const schema = fromType<A>({ ignoreErrors: true })
+  `);
+
+  const schema = Test.getSchema(result)
+  expect(schema).toEqual(
+    expect.objectContaining({
+      properties: expect.objectContaining({
+        a: {
+          type: "string"
+        }
+      })
+    })
+  );
+})
