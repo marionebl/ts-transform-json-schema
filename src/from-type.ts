@@ -1,4 +1,4 @@
-import { Args, Definition } from "@marionebl/typescript-json-schema";
+import { Args, Definition } from "typescript-json-schema";
 
 export { Args, Definition };
 
