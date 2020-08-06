@@ -55,7 +55,7 @@ export const getTransformer = (program: ts.Program) => {
         const rawSpec = node.moduleSpecifier.getText();
         const spec = rawSpec.substring(1, rawSpec.length - 1);
 
-        if (spec === "ts-transform-json-schema") {
+        if (spec === "@env0/ts-transform-json-schema") {
           return;
         }
       }
