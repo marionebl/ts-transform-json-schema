@@ -2,6 +2,8 @@ import * as ts from "typescript";
 import * as tjs from "typescript-json-schema";
 import * as JSON5 from "json5";
 
+const packageName = "@env0/ts-transform-json-schema";
+
 export interface TransformerOptions {
   env: { [key: string]: string };
 }
@@ -24,7 +26,7 @@ export const getTransformer = (program: ts.Program) => {
         if (signature !== undefined && signature.declaration !== undefined) {
           const sourceName = signature.declaration.getSourceFile().fileName;
 
-          if (!sourceName.includes("ts-transform-json-schema")) {
+          if (!sourceName.includes(packageName)) {
             return ts.visitEachChild(node, visitor, ctx);
           }
 
@@ -55,7 +57,7 @@ export const getTransformer = (program: ts.Program) => {
         const rawSpec = node.moduleSpecifier.getText();
         const spec = rawSpec.substring(1, rawSpec.length - 1);
 
-        if (spec === "@env0/ts-transform-json-schema") {
+        if (spec === packageName) {
           return;
         }
       }
