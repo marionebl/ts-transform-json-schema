@@ -9,11 +9,12 @@
   ],
   "scripts": {
     "test": "jest",
-    "build": "tsc"
+    "build": "tsc",
+    "prepublish": "npm run build && cp package.json lib/package.json && cp package-lock.json lib/package-lock.json"
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/marionebl/ts-transform-json-schema.git"
+    "url": "https://github.com/env0/ts-transform-json-schema.git"
   },
   "keywords": [
     "ts-transform"
