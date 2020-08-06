@@ -1,6 +1,6 @@
 {
   "name": "@env0/ts-transform-json-schema",
-  "version": "2.0.7",
+  "version": "2.0.8",
   "description": "Generate inline JSON schema from TypeScript types",
   "files": [
     "lib",
@@ -42,7 +42,8 @@
   },
   "dependencies": {
     "json5": "^2.1.1",
-    "typescript": "^3.5.3",
     "typescript-json-schema": "^0.42.0"
-  }
+  },
+  "peerDependencies": {
+    "typescript": "^3.5.3"}
 }
