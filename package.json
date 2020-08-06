@@ -1,6 +1,6 @@
 {
   "name": "@env0/ts-transform-json-schema",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "Generate inline JSON schema from TypeScript types",
   "files": [
     "lib",
@@ -10,7 +10,7 @@
   "scripts": {
     "test": "jest",
     "build": "tsc",
-    "prepublish": "npm run build && cp package.json lib/package.json && cp package-lock.json lib/package-lock.json"
+    "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",
