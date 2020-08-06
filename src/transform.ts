@@ -43,7 +43,7 @@ export const getTransformer = (program: ts.Program) => {
           }
 
           const compilerOptions = ctx.getCompilerOptions();
-          const apiFiles = program.getSourceFiles().map(f => f.fileName).filter(n => n.endsWith('api.d.ts'));
+          const apiFiles = program.getSourceFiles().map(f => f.fileName).filter(n => n.endsWith('/api.d.ts'));
           const apiProgram = tjs.getProgramFromFiles(apiFiles, compilerOptions);
           const generator = tjs.buildGenerator(apiProgram, options);
           const namespacedTypeName = typeChecker.getFullyQualifiedName(symbol).replace(/".*"\./, "");
