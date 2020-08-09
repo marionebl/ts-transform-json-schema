@@ -36,7 +36,10 @@ export const getTransformer = (program: ts.Program) => {
           const symbol = type.aliasSymbol || type.symbol;
 
           const argNode = node.arguments[0];
-          const options = argNode ? getOptions(argNode) : {};
+          const options = argNode ? getOptions(argNode) : {
+            required: true,
+            noExtraProps: true
+          };
 
           if (typeof symbol === "undefined" || symbol === null) {
             throw new Error(`Could not find symbol for passed type`);
