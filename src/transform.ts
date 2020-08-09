@@ -2,7 +2,7 @@ import * as ts from "typescript";
 import * as tjs from "typescript-json-schema";
 import * as JSON5 from "json5";
 
-const packageName = "@env0/ts-transform-json-schema";
+const packageName = "env0-ts-transform-json-schema";
 
 export interface TransformerOptions {
   env: { [key: string]: string };
