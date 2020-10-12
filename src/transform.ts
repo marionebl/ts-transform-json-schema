@@ -45,7 +45,14 @@ export const getTransformer = (program: ts.Program) => {
             throw new Error(`Could not find symbol for passed type`);
           }
 
-          const compilerOptions = ctx.getCompilerOptions();
+          // ignoring since generateTSConfig is undeclared (but exported)
+          // @ts-ignore
+          const configAsString = ts.generateTSConfig(ctx.getCompilerOptions(), [], '\n');
+          const tsconfig = JSON5.parse(configAsString);
+          const compilerOptions = Object.fromEntries(
+              Object.keys(ctx.getCompilerOptions()).map(key => [key, tsconfig.compilerOptions[key]])
+          );
+
           const apiFiles = program.getSourceFiles().map(f => f.fileName).filter(n => n.endsWith('/api.d.ts'));
           const apiProgram = tjs.getProgramFromFiles(apiFiles, compilerOptions);
           const generator = tjs.buildGenerator(apiProgram, options);
