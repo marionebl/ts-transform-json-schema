@@ -1,6 +1,6 @@
 {
   "name": "env0-ts-transform-json-schema",
-  "version": "2.0.10",
+  "version": "2.0.11",
   "description": "Generate inline JSON schema from TypeScript types",
   "files": [
     "lib",
