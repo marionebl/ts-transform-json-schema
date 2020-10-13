@@ -42,7 +42,7 @@
   },
   "dependencies": {
     "json5": "^2.1.1",
-    "typescript-json-schema": "^0.42.0"
+    "ts-json-schema-generator": "0.76.1"
   },
   "peerDependencies": {
     "typescript": "^3.5.3"}
