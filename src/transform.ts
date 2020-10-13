@@ -1,5 +1,5 @@
 import * as ts from "typescript";
-import * as tjs from "typescript-json-schema";
+import * as tjs from "ts-json-schema-generator";
 import * as JSON5 from "json5";
 
 const packageName = "env0-ts-transform-json-schema";
@@ -45,19 +45,23 @@ export const getTransformer = (program: ts.Program) => {
             throw new Error(`Could not find symbol for passed type`);
           }
 
-          // ignoring since generateTSConfig is undeclared (but exported)
-          // @ts-ignore
-          const configAsString = ts.generateTSConfig(ctx.getCompilerOptions(), [], '\n');
-          const tsconfig = JSON5.parse(configAsString);
-          const compilerOptions = Object.fromEntries(
-              Object.keys(ctx.getCompilerOptions()).map(key => [key, tsconfig.compilerOptions[key]])
-          );
+          const tsconfig = ctx.getCompilerOptions().configFilePath as string;
+          const projectApi = tsconfig.replace('tsconfig.json', 'api.d.ts');
+          const hasApiFile = program.getSourceFiles().map(f => f.fileName).includes(projectApi);
 
-          const apiFiles = program.getSourceFiles().map(f => f.fileName).filter(n => n.endsWith('/api.d.ts'));
-          const apiProgram = tjs.getProgramFromFiles(apiFiles, compilerOptions);
-          const generator = tjs.buildGenerator(apiProgram, options);
+          if(!hasApiFile) throw 'Project must have an api.d.ts file that includes the type'
+
           const namespacedTypeName = typeChecker.getFullyQualifiedName(symbol).replace(/".*"\./, "");
-          const schema = generator.getSchemaForSymbol(namespacedTypeName);
+
+          const config = {
+            path: projectApi,
+            tsconfig,
+            type: namespacedTypeName,
+            ...options
+          };
+
+          const generator = tjs.createGenerator(config);
+          const schema = generator.createSchema(config.type);
 
           return toLiteral(schema);
         }
@@ -109,7 +113,7 @@ function toLiteral(input: unknown): ts.PrimaryExpression {
   return ts.createNull();
 }
 
-function getOptions(node: ts.Node): unknown {
+function getOptions(node: ts.Node): object {
   try {
     return JSON5.parse(node.getText());
   } catch (err) {
