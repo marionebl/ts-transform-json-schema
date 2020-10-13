@@ -46,13 +46,15 @@ export const getTransformer = (program: ts.Program) => {
           }
 
           const tsconfig = ctx.getCompilerOptions().configFilePath as string;
-          let projectApi = tsconfig.replace('tsconfig.json', 'api.d.ts');
-          const apiFiles = program.getSourceFiles().map(f => f.fileName).filter(n => n === projectApi);
-          if(apiFiles.length > 1) throw `Found too many files matching ${apiFiles}`
+          const projectApi = tsconfig.replace('tsconfig.json', 'api.d.ts');
+          const hasApiFile = program.getSourceFiles().map(f => f.fileName).includes(projectApi);
+
+          if(!hasApiFile) throw 'Project must have an api.d.ts file that includes the type'
+
           const namespacedTypeName = typeChecker.getFullyQualifiedName(symbol).replace(/".*"\./, "");
 
           const config = {
-            path: apiFiles[0],
+            path: projectApi,
             tsconfig,
             type: namespacedTypeName,
             ...options
