@@ -39,7 +39,7 @@ export const getTransformer = (program: ts.Program) => {
           const options = argNode ? getOptions(argNode) : {
             required: true,
             noExtraProps: true,
-            noTypeCheck: true
+            skipTypeCheck: true
           };
 
           if (typeof symbol === "undefined" || symbol === null) {
