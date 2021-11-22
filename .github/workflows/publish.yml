@@ -1,4 +1,4 @@
-name: Publish Self-Hosted Agent Helm Chart
+name: Publish
 on:
   push:
     tags:
@@ -11,7 +11,7 @@ jobs:
     - name: Setup Node.js environment
       uses: actions/setup-node@v2.4.1
       with:
-        token: ${{ secrets.RonisNpmTokenShameOnRoni }}
+        token: ${{ secrets.RONIS_NPM_TOKEN_SHAME_ON_ME }}
         node-version: '14'
     - run: npm install
     - run: npm run publish    
