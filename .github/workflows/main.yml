@@ -1,0 +1,17 @@
+name: Publish Self-Hosted Agent Helm Chart
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2    
+    - name: Setup Node.js environment
+      uses: actions/setup-node@v2.4.1
+      with:
+        token: ${{ secrets.RonisNpmTokenShameOnRoni }}
+        node-version: '14'
+    - run: npm install
+    - run: npm run publish    
