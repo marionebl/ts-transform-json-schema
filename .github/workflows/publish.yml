@@ -1,7 +1,8 @@
 name: Publish
 on:
   release:
-    types: [published]
+    types:
+      - published
 jobs:
   push:
     runs-on: ubuntu-latest
@@ -13,6 +14,7 @@ jobs:
         node-version: '14'
         registry-url: 'https://registry.npmjs.org'
     - run: npm install
-    - run: npm publish
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.RONIS_NPM_TOKEN_SHAME_ON_ME }}
+    - uses: JS-DevTools/npm-publish@v1
+      with:
+        token: ${{ secrets.RONIS_NPM_TOKEN_SHAME_ON_ME }}
+
