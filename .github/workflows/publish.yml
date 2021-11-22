@@ -11,7 +11,8 @@ jobs:
     - name: Setup Node.js environment
       uses: actions/setup-node@v2.4.1
       with:
-        token: ${{ secrets.RONIS_NPM_TOKEN_SHAME_ON_ME }}
         node-version: '14'
     - run: npm install
-    - run: npm publish    
+    - run: npm publish
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.RONIS_NPM_TOKEN_SHAME_ON_ME }}
