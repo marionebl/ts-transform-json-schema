@@ -18,9 +18,29 @@ const getFullyQualifiedTypeName = (node) => {
     }
     return qualifiers.reverse().join('.');
 }
-
+let generator;
+let config;
 export const getTransformer = (program: ts.Program) => {
     const typeChecker = program.getTypeChecker();
+
+    if (!generator) {
+        const tsconfig = program.getCompilerOptions().configFilePath as string;
+        const projectApi = tsconfig.replace('tsconfig.json', 'api.d.ts');
+        const hasApiFile = program.getSourceFiles().map(f => f.fileName).includes(projectApi);
+
+        if (!hasApiFile) throw 'Project must have an api.d.ts file that includes the type'
+
+        config = {
+            path: projectApi,
+            tsconfig,
+            type: '*',
+            required: true,
+            noExtraProps: true,
+            skipTypeCheck: true
+        };
+
+        generator = tjs.createGenerator(config);
+    }
 
     function getVisitor(ctx: ts.TransformationContext, sf: ts.SourceFile) {
         const visitor: ts.Visitor = (node: ts.Node): ts.VisitResult<ts.Node> => {
@@ -46,35 +66,16 @@ export const getTransformer = (program: ts.Program) => {
                     const type = typeChecker.getTypeFromTypeNode(typeArgument);
                     const symbol = type.aliasSymbol || type.symbol;
 
-                    const argNode = node.arguments[0];
-                    const options = argNode ? getOptions(argNode) : {
-                        required: true,
-                        noExtraProps: true,
-                        skipTypeCheck: true
-                    };
-
                     if (typeof symbol === "undefined" || symbol === null) {
                         throw new Error(`Could not find symbol for passed type`);
                     }
 
-                    const tsconfig = ctx.getCompilerOptions().configFilePath as string;
-                    const projectApi = tsconfig.replace('tsconfig.json', 'api.d.ts');
-                    const hasApiFile = program.getSourceFiles().map(f => f.fileName).includes(projectApi);
-
-                    if (!hasApiFile) throw 'Project must have an api.d.ts file that includes the type'
-
                     // @ts-ignore typeName exists in real but not on the type
                     const namespacedTypeName = getFullyQualifiedTypeName(typeArgument.typeName);
 
-                    const config = {
-                        path: projectApi,
-                        tsconfig,
-                        type: namespacedTypeName,
-                        ...options
-                    };
-
-                    const generator = tjs.createGenerator(config);
-                    const schema = generator.createSchema(config.type);
+                    const argNode = node.arguments[0];
+                    const schema = (argNode ? tjs.createGenerator({ ...config, ...getOptions(argNode)}) : generator)
+                        .createSchema(namespacedTypeName);
 
                     return toLiteral(schema);
                 }
