@@ -1,7 +1,7 @@
-import { Args, Definition } from "@marionebl/typescript-json-schema";
+import { Config, Definition } from "ts-json-schema-generator";
 
-export { Args, Definition };
+export { Config, Definition };
 
-export function fromType<T>(args?: Partial<Args>): Definition | null {
+export function fromType<T>(args?: Partial<Config>): Definition | null {
     throw new Error("fromType should not be used during runtime, apply ts-transform-json-schema instead");
 }

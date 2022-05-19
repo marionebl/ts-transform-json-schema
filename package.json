@@ -1,6 +1,6 @@
 {
-  "name": "ts-transform-json-schema",
-  "version": "2.0.3",
+  "name": "env0-ts-transform-json-schema",
+  "version": "2.0.15",
   "description": "Generate inline JSON schema from TypeScript types",
   "files": [
     "lib",
@@ -9,11 +9,12 @@
   ],
   "scripts": {
     "test": "jest",
-    "build": "tsc"
+    "build": "tsc",
+    "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/marionebl/ts-transform-json-schema.git"
+    "url": "https://github.com/env0/ts-transform-json-schema.git"
   },
   "keywords": [
     "ts-transform"
@@ -40,9 +41,10 @@
     "ttypescript": "^1.5.8"
   },
   "dependencies": {
-    "@marionebl/typescript-json-schema": "^0.36.0",
     "json5": "^2.1.1",
-    "typescript": "^3.5.3",
-    "typescript-json-schema": "^0.42.0"
+    "ts-json-schema-generator": "0.95.0"
+  },
+  "peerDependencies": {
+    "typescript": "^4.4.4"
   }
 }

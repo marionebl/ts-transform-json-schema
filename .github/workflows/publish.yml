@@ -1,0 +1,20 @@
+name: Publish
+on:
+  release:
+    types:
+      - published
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2    
+    - name: Setup Node.js environment
+      uses: actions/setup-node@v2.4.1
+      with:
+        node-version: '14'
+        registry-url: 'https://registry.npmjs.org'
+    - run: npm install
+    - uses: JS-DevTools/npm-publish@v1
+      with:
+        token: ${{ secrets.RONIS_NPM_TOKEN_SHAME_ON_ME }}
+
